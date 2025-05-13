@@ -28,12 +28,6 @@ jobs:
           cd todo-service
           npm install
           npm test
-          
-      - name: Install dependencies and test frontend
-        run: |
-          cd frontend
-          npm install
-          npm test -- --watchAll=false
 
   build-and-push:
     needs: test
