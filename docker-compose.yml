@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - app-network
+
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - MONGODB_URI=mongodb://mongodb:27017/auth-service
+      - JWT_SECRET=your-secret-key
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  todo-service:
+    build: ./todo-service
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - MONGODB_URI=mongodb://mongodb:27017/todo-service
+      - JWT_SECRET=your-secret-key
+    depends_on:
+      - mongodb
+    networks:
+      - app-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_AUTH_API_URL=http://localhost:3001/api
+      - REACT_APP_TODO_API_URL=http://localhost:3002/api
+    depends_on:
+      - auth-service
+      - todo-service
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongodb_data: 
