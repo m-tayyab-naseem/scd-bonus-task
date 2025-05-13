@@ -12,6 +12,16 @@ app.post('/api/auth/login', (req, res) => {
   res.status(200).json({ message: 'User logged in' });
 });
 
+let server;
+
+beforeAll(() => {
+  server = app.listen(0); // Random port
+});
+
+afterAll((done) => {
+  server.close(done);
+});
+
 describe('Auth API', () => {
   describe('POST /api/auth/register', () => {
     it('should return 201 for valid registration', async () => {
@@ -21,7 +31,7 @@ describe('Auth API', () => {
         password: 'password123'
       };
 
-      const response = await request(app)
+      const response = await request(server)
         .post('/api/auth/register')
         .send(userData);
 
@@ -37,7 +47,7 @@ describe('Auth API', () => {
         password: 'password123'
       };
 
-      const response = await request(app)
+      const response = await request(server)
         .post('/api/auth/login')
         .send(loginData);
 
